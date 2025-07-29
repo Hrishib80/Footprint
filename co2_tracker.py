@@ -1,45 +1,27 @@
 import streamlit as st
-import yaml
-import os
 from datetime import datetime, date
+from database import db_manager
 
 class CO2Tracker:
     def __init__(self):
-        self.data_dir = "user_data"
-        if not os.path.exists(self.data_dir):
-            os.makedirs(self.data_dir)
-    
-    def get_user_data_file(self, username):
-        """Get the data file path for a specific user"""
-        return os.path.join(self.data_dir, f"{username}_co2_data.yaml")
+        pass
     
     def load_user_data(self, username):
-        """Load CO₂ data for a specific user"""
-        file_path = self.get_user_data_file(username)
-        if not os.path.exists(file_path):
-            return []
-        
-        with open(file_path, "r") as f:
-            data = yaml.safe_load(f)
-            return data if data else []
+        """Load CO₂ data for a specific user from database"""
+        return db_manager.get_user_co2_entries(username)
     
     def save_user_data(self, username, data):
-        """Save CO₂ data for a specific user"""
-        file_path = self.get_user_data_file(username)
-        with open(file_path, "w") as f:
-            yaml.dump(data, f)
+        """Save CO₂ data for a specific user (compatibility method - not used with database)"""
+        # This method is kept for compatibility but not used with database
+        pass
     
     def clear_user_data(self, username):
         """Clear all CO₂ data for a specific user"""
-        file_path = self.get_user_data_file(username)
-        if os.path.exists(file_path):
-            os.remove(file_path)
+        return db_manager.clear_user_co2_entries(username)
     
     def add_emission_entry(self, username, entry):
         """Add a new emission entry for a user"""
-        data = self.load_user_data(username)
-        data.append(entry)
-        self.save_user_data(username, data)
+        return db_manager.add_co2_entry(username, entry)
     
     def show_tracker(self, username):
         """Display the CO₂ tracking interface"""
@@ -262,21 +244,25 @@ class CO2Tracker:
                 min_date = min(datetime.fromisoformat(entry['date']).date() for entry in data)
                 max_date = max(datetime.fromisoformat(entry['date']).date() for entry in data)
                 start_date = st.date_input("From Date:", value=min_date, min_value=min_date, max_value=max_date)
+            else:
+                start_date = date.today()
         
         with col3:
             if data:
                 end_date = st.date_input("To Date:", value=max_date, min_value=min_date, max_value=max_date)
+            else:
+                end_date = date.today()
         
         # Filter data
         filtered_data = sorted_data
         if selected_category != "All":
             filtered_data = [entry for entry in filtered_data if entry['category'] == selected_category]
         
-        if data:  # Only apply date filter if we have data
-            filtered_data = [
-                entry for entry in filtered_data
-                if start_date <= datetime.fromisoformat(entry['date']).date() <= end_date
-            ]
+        # Apply date filter
+        filtered_data = [
+            entry for entry in filtered_data
+            if start_date <= datetime.fromisoformat(entry['date']).date() <= end_date
+        ]
         
         # Display summary
         if filtered_data:
@@ -331,8 +317,7 @@ class CO2Tracker:
                 
                 # Delete button
                 if st.button(f"🗑️ Delete", key=f"delete_{i}", type="secondary"):
-                    # Simple confirmation using session state
-                    confirm_key = f"confirm_delete_{i}"
+                    confirm_key = f"confirm_delete_{entry['id']}"
                     if confirm_key not in st.session_state:
                         st.session_state[confirm_key] = False
                     
@@ -341,13 +326,14 @@ class CO2Tracker:
                         st.warning(f"⚠️ Are you sure you want to delete: **{entry['activity']}**?")
                         col_yes, col_no = st.columns(2)
                         with col_yes:
-                            if st.button("✅ Yes, Delete", key=f"yes_{i}"):
-                                data.remove(entry)
-                                self.save_user_data(username, data)
-                                st.success("Entry deleted!")
-                                st.rerun()
+                            if st.button("✅ Yes, Delete", key=f"yes_{entry['id']}"):
+                                if db_manager.delete_co2_entry(entry['id'], username):
+                                    st.success("Entry deleted!")
+                                    st.rerun()
+                                else:
+                                    st.error("Failed to delete entry.")
                         with col_no:
-                            if st.button("❌ Cancel", key=f"no_{i}"):
+                            if st.button("❌ Cancel", key=f"no_{entry['id']}"):
                                 st.session_state[confirm_key] = False
                                 st.rerun()
         

@@ -1,42 +1,19 @@
 import streamlit as st
-import yaml
-import os
 from datetime import datetime, timedelta
 from co2_tracker import CO2Tracker
+from database import db_manager
 
 class RewardSystem:
     def __init__(self):
         self.co2_tracker = CO2Tracker()
-        self.rewards_dir = "user_data"
         
-    def get_user_rewards_file(self, username):
-        """Get the rewards file path for a specific user"""
-        return os.path.join(self.rewards_dir, f"{username}_rewards.yaml")
-    
     def load_user_rewards(self, username):
-        """Load rewards data for a specific user"""
-        file_path = self.get_user_rewards_file(username)
-        if not os.path.exists(file_path):
-            return {
-                "total_points": 0,
-                "level": 1,
-                "badges": [],
-                "achievements": [],
-                "streak_days": 0,
-                "last_entry_date": None,
-                "monthly_goals": {},
-                "best_week": {"week": None, "reduction": 0}
-            }
-        
-        with open(file_path, "r") as f:
-            data = yaml.safe_load(f)
-            return data if data else {}
+        """Load rewards data for a specific user from database"""
+        return db_manager.get_user_rewards(username)
     
     def save_user_rewards(self, username, rewards_data):
-        """Save rewards data for a specific user"""
-        file_path = self.get_user_rewards_file(username)
-        with open(file_path, "w") as f:
-            yaml.dump(rewards_data, f)
+        """Save rewards data for a specific user to database"""
+        return db_manager.save_user_rewards(username, rewards_data)
     
     def calculate_level(self, points):
         """Calculate user level based on points"""
