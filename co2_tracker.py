@@ -43,8 +43,13 @@ class CO2Tracker:
     
     def show_tracker(self, username):
         """Display the CO₂ tracking interface"""
-        st.title("🌱 Track Your CO₂ Emissions")
-        st.markdown("Add your daily activities to track your carbon footprint")
+        # Modern header with green gradient
+        st.markdown("""
+        <div style='background: linear-gradient(90deg, #00C851, #00A040); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
+            <h1 style='color: white; margin: 0; text-align: center;'>🌱 Track Your CO₂ Emissions</h1>
+            <p style='color: white; margin: 5px 0 0 0; text-align: center; opacity: 0.9;'>Add your daily activities to track your carbon footprint</p>
+        </div>
+        """, unsafe_allow_html=True)
         
         # Tabs for different tracking methods
         tab1, tab2, tab3 = st.tabs(["📝 Quick Entry", "📊 Detailed Entry", "📋 View History"])
@@ -63,18 +68,41 @@ class CO2Tracker:
         st.subheader("⚡ Quick Entry")
         st.markdown("Select from common activities with pre-calculated CO₂ values")
         
-        # Predefined activities with CO₂ factors (kg CO₂)
+        # Predefined activities with CO₂ factors (kg CO₂) - Enhanced list
         quick_activities = {
-            "🚗 Car trip (10 km)": {"category": "Transportation", "co2": 2.31},
-            "🚌 Bus trip (10 km)": {"category": "Transportation", "co2": 0.89},
-            "🚊 Train trip (10 km)": {"category": "Transportation", "co2": 0.41},
-            "✈️ Domestic flight (1000 km)": {"category": "Transportation", "co2": 254.0},
-            "💡 Home electricity (1 day avg)": {"category": "Energy", "co2": 6.8},
-            "🔥 Natural gas heating (1 day)": {"category": "Energy", "co2": 5.3},
-            "🥩 Beef meal": {"category": "Food", "co2": 6.61},
-            "🐔 Chicken meal": {"category": "Food", "co2": 1.57},
-            "🌱 Vegetarian meal": {"category": "Food", "co2": 0.38},
-            "🛒 Grocery shopping": {"category": "Shopping", "co2": 3.2},
+            "🚗 Car trip (10 km)": {"category": "Transportation", "co2": 2.31, "fuel_type": "gasoline"},
+            "🚙 SUV trip (10 km)": {"category": "Transportation", "co2": 3.2, "fuel_type": "gasoline"},
+            "🚗 Electric car (10 km)": {"category": "Transportation", "co2": 0.5, "fuel_type": "electric"},
+            "🏍️ Motorcycle (10 km)": {"category": "Transportation", "co2": 1.8, "fuel_type": "gasoline"},
+            "🚌 Bus trip (10 km)": {"category": "Transportation", "co2": 0.89, "occupancy": "shared"},
+            "🚊 Train trip (10 km)": {"category": "Transportation", "co2": 0.41, "occupancy": "shared"},
+            "🚇 Metro/Subway (10 km)": {"category": "Transportation", "co2": 0.28, "occupancy": "shared"},
+            "🚲 Bike ride (10 km)": {"category": "Transportation", "co2": 0.0, "eco_friendly": True},
+            "🚶 Walking (5 km)": {"category": "Transportation", "co2": 0.0, "eco_friendly": True},
+            "✈️ Domestic flight (1000 km)": {"category": "Transportation", "co2": 254.0, "distance": "long"},
+            "✈️ International flight (3000 km)": {"category": "Transportation", "co2": 820.0, "distance": "very_long"},
+            "💡 Home electricity (1 day avg)": {"category": "Energy", "co2": 6.8, "source": "grid"},
+            "☀️ Solar electricity (1 day)": {"category": "Energy", "co2": 0.2, "source": "renewable"},
+            "🔥 Natural gas heating (1 day)": {"category": "Energy", "co2": 5.3, "source": "fossil"},
+            "🔥 Oil heating (1 day)": {"category": "Energy", "co2": 7.1, "source": "fossil"},
+            "💡 LED lights (8 hours)": {"category": "Energy", "co2": 0.8, "efficiency": "high"},
+            "🥩 Beef meal": {"category": "Food", "co2": 6.61, "protein": "red_meat"},
+            "🐔 Chicken meal": {"category": "Food", "co2": 1.57, "protein": "white_meat"},
+            "🐟 Fish meal": {"category": "Food", "co2": 2.87, "protein": "seafood"},
+            "🥛 Dairy meal": {"category": "Food", "co2": 3.2, "protein": "dairy"},
+            "🌱 Vegetarian meal": {"category": "Food", "co2": 0.38, "protein": "plant", "eco_friendly": True},
+            "🌿 Vegan meal": {"category": "Food", "co2": 0.22, "protein": "plant", "eco_friendly": True},
+            "☕ Coffee (1 cup)": {"category": "Food", "co2": 0.37, "beverage": True},
+            "🍺 Beer (1 bottle)": {"category": "Food", "co2": 0.74, "beverage": True},
+            "🛒 Grocery shopping": {"category": "Shopping", "co2": 3.2, "type": "essentials"},
+            "👕 Clothing purchase": {"category": "Shopping", "co2": 8.5, "type": "apparel"},
+            "📱 Electronics purchase": {"category": "Shopping", "co2": 85.0, "type": "electronics"},
+            "🏠 Home heating (1 day)": {"category": "Home", "co2": 12.5, "system": "HVAC"},
+            "❄️ Air conditioning (8 hours)": {"category": "Home", "co2": 8.9, "system": "cooling"},
+            "🚿 Hot shower (10 min)": {"category": "Home", "co2": 2.3, "water": "heated"},
+            "🧺 Laundry load": {"category": "Home", "co2": 2.8, "appliance": "washing"},
+            "💻 Work from home (8 hours)": {"category": "Work", "co2": 4.6, "location": "remote"},
+            "🏢 Office work (8 hours)": {"category": "Work", "co2": 6.2, "location": "office"},
         }
         
         with st.form("quick_entry_form"):
@@ -85,16 +113,42 @@ class CO2Tracker:
             
             activity_data = quick_activities[selected_activity]
             
-            col1, col2 = st.columns(2)
+            col1, col2, col3 = st.columns(3)
             with col1:
                 quantity = st.number_input("Quantity/Times:", min_value=0.1, value=1.0, step=0.1)
             with col2:
                 entry_date = st.date_input("Date:", value=date.today())
+            with col3:
+                # Show activity attributes
+                activity_attrs = {k: v for k, v in activity_data.items() if k not in ['category', 'co2']}
+                if activity_attrs:
+                    attr_text = ", ".join([f"{k}: {v}" for k, v in activity_attrs.items()])
+                    st.info(f"Attributes: {attr_text}")
             
             estimated_co2 = activity_data["co2"] * quantity
-            st.info(f"Estimated CO₂: **{estimated_co2:.2f} kg**")
             
-            notes = st.text_area("Additional Notes (optional):", placeholder="Any additional details...")
+            # Color-coded CO2 estimate
+            if estimated_co2 < 1:
+                co2_color = "🟢"  # Green for low
+            elif estimated_co2 < 5:
+                co2_color = "🟡"  # Yellow for medium
+            else:
+                co2_color = "🔴"  # Red for high
+            
+            st.markdown(f"""
+            <div style='background: linear-gradient(135deg, #E8F5E8, #F0FFF0); padding: 10px; border-radius: 5px; margin: 10px 0;'>
+                <h4 style='margin: 0; color: #1B5E20;'>{co2_color} Estimated CO₂: <span style='color: #00C851;'>{estimated_co2:.2f} kg</span></h4>
+            </div>
+            """, unsafe_allow_html=True)
+            
+            # Enhanced form fields
+            col4, col5 = st.columns(2)
+            with col4:
+                location = st.text_input("Location (optional):", placeholder="e.g., City, Route")
+            with col5:
+                weather = st.selectbox("Weather (optional):", ["", "Sunny", "Rainy", "Cloudy", "Snowy", "Windy"])
+            
+            notes = st.text_area("Additional Notes (optional):", placeholder="Any additional details, companions, purpose of trip, etc...")
             
             submit_btn = st.form_submit_button("➕ Add Entry", use_container_width=True)
             
@@ -105,9 +159,12 @@ class CO2Tracker:
                     "category": activity_data["category"],
                     "co2_amount": round(estimated_co2, 2),
                     "quantity": quantity,
+                    "location": location if location.strip() else None,
+                    "weather": weather if weather else None,
                     "notes": notes,
                     "entry_type": "quick",
-                    "timestamp": datetime.now().isoformat()
+                    "timestamp": datetime.now().isoformat(),
+                    "attributes": {k: v for k, v in activity_data.items() if k not in ['category', 'co2']}
                 }
                 
                 self.add_emission_entry(username, entry)
@@ -133,14 +190,23 @@ class CO2Tracker:
                 co2_amount = st.number_input("CO₂ Amount (kg):", min_value=0.0, step=0.01, format="%.2f")
                 entry_date = st.date_input("Date:", value=date.today())
             
-            # Additional details
+            # Additional details - Enhanced
             col3, col4 = st.columns(2)
             with col3:
                 distance = st.number_input("Distance (km, optional):", min_value=0.0, step=0.1, format="%.1f")
             with col4:
                 duration = st.number_input("Duration (hours, optional):", min_value=0.0, step=0.1, format="%.1f")
             
-            notes = st.text_area("Notes:", placeholder="Additional details, calculation method, etc...")
+            # More attributes
+            col5, col6 = st.columns(2)
+            with col5:
+                participants = st.number_input("Number of people involved:", min_value=1, value=1, step=1)
+                location = st.text_input("Location:", placeholder="City, country, route")
+            with col6:
+                purpose = st.selectbox("Purpose:", ["", "Work", "Personal", "Recreation", "Essential", "Emergency"])
+                efficiency = st.selectbox("Efficiency rating:", ["", "Very High", "High", "Medium", "Low", "Very Low"])
+            
+            notes = st.text_area("Notes:", placeholder="Additional details, calculation method, alternatives considered, etc...")
             
             submit_btn = st.form_submit_button("➕ Add Detailed Entry", use_container_width=True)
             
@@ -157,6 +223,10 @@ class CO2Tracker:
                         "co2_amount": round(co2_amount, 2),
                         "distance": distance if distance > 0 else None,
                         "duration": duration if duration > 0 else None,
+                        "participants": participants,
+                        "location": location if location.strip() else None,
+                        "purpose": purpose if purpose else None,
+                        "efficiency": efficiency if efficiency else None,
                         "notes": notes,
                         "entry_type": "detailed",
                         "timestamp": datetime.now().isoformat()
@@ -230,25 +300,56 @@ class CO2Tracker:
                         st.write(f"**Distance:** {entry['distance']} km")
                     if entry.get('duration'):
                         st.write(f"**Duration:** {entry['duration']} hours")
+                    if entry.get('participants'):
+                        st.write(f"**People involved:** {entry['participants']}")
+                    if entry.get('location'):
+                        st.write(f"**Location:** {entry['location']}")
                 
                 with col2:
                     st.write(f"**Entry Type:** {entry.get('entry_type', 'unknown').title()}")
                     if entry.get('quantity'):
                         st.write(f"**Quantity:** {entry['quantity']}")
+                    if entry.get('purpose'):
+                        st.write(f"**Purpose:** {entry['purpose']}")
+                    if entry.get('efficiency'):
+                        st.write(f"**Efficiency:** {entry['efficiency']}")
+                    if entry.get('weather'):
+                        st.write(f"**Weather:** {entry['weather']}")
                     if entry.get('timestamp'):
                         timestamp = datetime.fromisoformat(entry['timestamp'])
                         st.write(f"**Added:** {timestamp.strftime('%Y-%m-%d %H:%M')}")
+                
+                # Show attributes if available
+                if entry.get('attributes'):
+                    st.write("**Activity Attributes:**")
+                    attrs = entry['attributes']
+                    attr_text = ", ".join([f"{k}: {v}" for k, v in attrs.items()])
+                    st.caption(attr_text)
                 
                 if entry.get('notes'):
                     st.write(f"**Notes:** {entry['notes']}")
                 
                 # Delete button
-                if st.button(f"🗑️ Delete", key=f"delete_{i}"):
-                    if st.confirm(f"Delete this entry: {entry['activity']}?"):
-                        data.remove(entry)
-                        self.save_user_data(username, data)
-                        st.success("Entry deleted!")
-                        st.rerun()
+                if st.button(f"🗑️ Delete", key=f"delete_{i}", type="secondary"):
+                    # Simple confirmation using session state
+                    confirm_key = f"confirm_delete_{i}"
+                    if confirm_key not in st.session_state:
+                        st.session_state[confirm_key] = False
+                    
+                    if not st.session_state[confirm_key]:
+                        st.session_state[confirm_key] = True
+                        st.warning(f"⚠️ Are you sure you want to delete: **{entry['activity']}**?")
+                        col_yes, col_no = st.columns(2)
+                        with col_yes:
+                            if st.button("✅ Yes, Delete", key=f"yes_{i}"):
+                                data.remove(entry)
+                                self.save_user_data(username, data)
+                                st.success("Entry deleted!")
+                                st.rerun()
+                        with col_no:
+                            if st.button("❌ Cancel", key=f"no_{i}"):
+                                st.session_state[confirm_key] = False
+                                st.rerun()
         
         if not filtered_data:
             st.info("No entries match the selected filters.")

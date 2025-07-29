@@ -2,6 +2,7 @@ import streamlit as st
 from auth import AuthManager
 from dashboard import Dashboard
 from co2_tracker import CO2Tracker
+from rewards import RewardSystem
 
 # Configure the app
 st.set_page_config(
@@ -23,6 +24,7 @@ if "current_page" not in st.session_state:
 auth_manager = AuthManager()
 dashboard = Dashboard()
 co2_tracker = CO2Tracker()
+reward_system = RewardSystem()
 
 def logout():
     """Handle user logout"""
@@ -48,7 +50,7 @@ def main():
         # Navigation menu
         page = st.radio(
             "Navigate to:",
-            ["Dashboard", "Track CO₂", "Profile"],
+            ["Dashboard", "Track CO₂", "🏆 Rewards", "Profile"],
             key="navigation"
         )
         
@@ -61,6 +63,8 @@ def main():
         dashboard.show_dashboard(st.session_state.username)
     elif page == "Track CO₂":
         co2_tracker.show_tracker(st.session_state.username)
+    elif page == "🏆 Rewards":
+        reward_system.show_rewards_dashboard(st.session_state.username)
     elif page == "Profile":
         show_profile()
 
@@ -91,10 +95,16 @@ def show_profile():
     st.subheader("🔧 Account Actions")
     
     if st.button("🗑️ Clear All CO₂ Data", type="secondary"):
-        if st.confirm("Are you sure you want to delete all your CO₂ tracking data? This action cannot be undone."):
-            co2_tracker.clear_user_data(st.session_state.username)
-            st.success("All CO₂ data has been cleared!")
-            st.rerun()
+        st.warning("⚠️ This will permanently delete all your CO₂ tracking data!")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("✅ Yes, Delete All", type="primary", use_container_width=True):
+                co2_tracker.clear_user_data(st.session_state.username)
+                st.success("All CO₂ data has been cleared!")
+                st.rerun()
+        with col2:
+            if st.button("❌ Cancel", use_container_width=True):
+                st.info("Delete operation cancelled.")
 
 if __name__ == "__main__":
     main()

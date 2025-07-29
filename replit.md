@@ -7,6 +7,8 @@ This is a Streamlit-based CO₂ emissions tracking application that allows users
 ## User Preferences
 
 Preferred communication style: Simple, everyday language.
+UI Design: Greenish color theme with modern dashboard styling.
+Features: Enhanced forms with detailed attributes, reward system for carbon footprint improvements.
 
 ## System Architecture
 
@@ -21,28 +23,40 @@ The application follows a modular, component-based architecture built on Streaml
 ## Key Components
 
 ### 1. Authentication System (`auth.py`)
-- **Purpose**: Handles user registration and login functionality
+- **Purpose**: Handles user registration and login functionality with modern tabbed interface
 - **Security**: Uses PBKDF2-SHA256 password hashing for secure credential storage
 - **Data Storage**: Stores user credentials in `users.yaml` file
 - **Validation**: Implements username (min 3 chars) and password (min 6 chars) validation
+- **UI**: Clean tabs for login/signup with enhanced form validation
 
 ### 2. CO₂ Tracking Module (`co2_tracker.py`)
 - **Purpose**: Manages emission data entry and storage for individual users
 - **Data Structure**: Stores user emissions in separate YAML files per user
 - **Features**: Supports adding, loading, and clearing emission entries
 - **Interface**: Provides tabbed interface for different entry methods (Quick, Detailed, History)
+- **Enhanced Attributes**: Location, weather, participants, purpose, efficiency ratings
+- **Activities**: Extended library of 30+ pre-calculated activities with detailed attributes
 
 ### 3. Dashboard Component (`dashboard.py`)
-- **Purpose**: Visualizes user emission data through charts and metrics
+- **Purpose**: Visualizes user emission data through modern charts and metrics
 - **Dependencies**: Uses Plotly for interactive charts and Pandas for data manipulation
-- **Features**: Key metrics display, time-series analysis, category breakdowns
+- **Features**: Color-coded metrics cards, time-series analysis, category breakdowns
+- **Styling**: Green gradient headers, modern metric cards with conditional coloring
 - **Data Processing**: Converts YAML data to DataFrames for analysis
 
-### 4. Main Application (`app.py`)
+### 4. Reward System (`rewards.py`)
+- **Purpose**: Gamifies carbon footprint reduction through achievements and points
+- **Features**: Level progression, achievement badges, weekly improvement tracking
+- **Points System**: Rewards for low-carbon activities, consistency, and improvements
+- **Analytics**: Tracks best performance weeks and provides improvement tips
+- **Motivation**: Encourages sustainable behavior through positive reinforcement
+
+### 5. Main Application (`app.py`)
 - **Purpose**: Orchestrates the entire application flow and navigation
 - **Session Management**: Handles authentication state and page routing
-- **Configuration**: Sets up Streamlit page config and initializes components
-- **Navigation**: Provides sidebar-based navigation for authenticated users
+- **Configuration**: Sets up Streamlit page config with green theme
+- **Navigation**: Provides sidebar-based navigation including new Rewards section
+- **Theme**: Consistent green color scheme throughout the application
 
 ## Data Flow
 
