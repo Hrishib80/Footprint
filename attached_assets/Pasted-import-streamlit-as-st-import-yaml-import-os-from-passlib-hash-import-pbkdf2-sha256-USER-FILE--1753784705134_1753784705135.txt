@@ -1,0 +1,74 @@
+import streamlit as st
+import yaml
+import os
+from passlib.hash import pbkdf2_sha256
+
+USER_FILE = "users.yaml"
+
+# Load users
+def load_users():
+    if not os.path.exists(USER_FILE):
+        return {}
+    with open(USER_FILE, "r") as f:
+        return yaml.safe_load(f) or {}
+
+# Save users
+def save_users(users):
+    with open(USER_FILE, "w") as f:
+        yaml.dump(users, f)
+
+# Check login
+def login_user(username, password, users):
+    if username in users and pbkdf2_sha256.verify(password, users[username]['password']):
+        return True
+    return False
+
+# Signup new user
+def signup_user(username, password):
+    users = load_users()
+    if username in users:
+        return False, "🚫 Username already exists!"
+    users[username] = {"password": pbkdf2_sha256.hash(password)}
+    save_users(users)
+    return True, "✅ Signup successful! You can now login."
+
+# -----------------------------
+# UI Starts Here
+st.set_page_config(page_title="🔐 Login / Signup", layout="centered")
+st.title("🔐 CO₂ Tracker Login")
+
+if "authenticated" not in st.session_state:
+    st.session_state.authenticated = False
+
+auth_mode = st.radio("Choose Mode:", ["Login", "Signup"], horizontal=True)
+
+if auth_mode == "Signup":
+    new_user = st.text_input("Choose a Username")
+    new_pass = st.text_input("Choose a Password", type="password")
+    if st.button("📌 Sign Up"):
+        if new_user.strip() == "" or new_pass.strip() == "":
+            st.error("Username and password cannot be empty.")
+        else:
+            success, message = signup_user(new_user, new_pass)
+            if success:
+                st.success(message)
+            else:
+                st.error(message)
+
+else:  # Login
+    username = st.text_input("Username")
+    password = st.text_input("Password", type="password")
+    if st.button("🔓 Login"):
+        users = load_users()
+        if login_user(username, password, users):
+            st.session_state.authenticated = True
+            st.session_state.username = username
+            st.success(f"✅ Welcome, {username}!")
+        else:
+            st.error("❌ Invalid credentials")
+
+# Show dashboard if logged in
+if st.session_state.authenticated:
+    st.markdown("---")
+    st.subheader(f"🌍 Welcome {st.session_state.username}")
+    st.write("Now you can continue to use the carbon tracker or any dashboard features...")
