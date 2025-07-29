@@ -120,7 +120,7 @@ class RewardsManager:
                 user_data = self.co2_tracker.load_user_data(username)
                 
                 if user_data:
-                    total_emissions = sum(entry.get('co2_amount', 0) for entry in user_data)
+                    total_emissions = sum(entry.get('co2_amount', 0) for entry in user_data)/len(user_data)
                     leaderboard.append({
                         "username": username,
                         "total_emissions": total_emissions,
@@ -189,7 +189,7 @@ class RewardsManager:
         
         # Leaderboard section
         st.subheader("🏆 Global Leaderboard")
-        st.markdown("*Rankings based on total CO₂ emissions (lower is better)*")
+        st.markdown("*Rankings based on average CO₂ emissions per day")
         
         leaderboard = self.get_leaderboard()
         
@@ -206,15 +206,15 @@ class RewardsManager:
             for i, user in enumerate(leaderboard[:10]):
                 if user['username'] == username:
                     # Highlight current user
-                    st.markdown(f"**→ {user['rank']}. {user['medal']} {user['username']} - {user['total_emissions']:.2f} kg CO₂ ({user['entries_count']} entries) ←**")
+                    st.markdown(f"**→ {user['rank']}. {user['medal']} {user['username']} - {user['total_emissions']:.2f} kg CO₂/day ({user['entries_count']} entries) ←**")
                 else:
-                    st.write(f"{user['rank']}. {user['medal']} {user['username']} - {user['total_emissions']:.2f} kg CO₂ ({user['entries_count']} entries)")
+                    st.write(f"{user['rank']}. {user['medal']} {user['username']} - {user['total_emissions']:.2f} kg CO₂/day ({user['entries_count']} entries)")
             
             # Show user's position if not in top 10
             if user_position and user_position['rank'] > 10:
                 st.markdown("---")
                 st.write("**Your Position:**")
-                st.markdown(f"**→ {user_position['rank']}. {user_position['medal']} {user_position['username']} - {user_position['total_emissions']:.2f} kg CO₂ ({user_position['entries_count']} entries) ←**")
+                st.markdown(f"**→ {user_position['rank']}. {user_position['medal']} {user_position['username']} - {user_position['total_emissions']:.2f} kg CO₂/day ({user_position['entries_count']} entries) ←**")
         else:
             st.info("No leaderboard data available yet. Start tracking CO₂ emissions to appear on the leaderboard!")
         
