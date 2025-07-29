@@ -8,6 +8,14 @@ This is a Streamlit-based CO₂ emissions tracking application that allows users
 
 Preferred communication style: Simple, everyday language.
 
+## Recent Changes
+
+**2025-07-29**: Completed migration from Replit Agent to Replit environment
+- ✓ Fixed Streamlit compatibility issues (removed `st.confirm`, improved error handling)
+- ✓ Created proper `.streamlit/config.toml` configuration for deployment
+- ✓ Updated dependencies and resolved all LSP diagnostics
+- ✓ Application successfully running on port 5000
+
 ## System Architecture
 
 The application follows a modular, component-based architecture built on Streamlit's web framework. It uses a file-based data storage approach with YAML serialization for both user authentication and emission data persistence. The architecture separates concerns into distinct modules: authentication management, data tracking, and dashboard visualization.

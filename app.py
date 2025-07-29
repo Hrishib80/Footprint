@@ -91,10 +91,16 @@ def show_profile():
     st.subheader("🔧 Account Actions")
     
     if st.button("🗑️ Clear All CO₂ Data", type="secondary"):
-        if st.confirm("Are you sure you want to delete all your CO₂ tracking data? This action cannot be undone."):
-            co2_tracker.clear_user_data(st.session_state.username)
-            st.success("All CO₂ data has been cleared!")
-            st.rerun()
+        st.warning("⚠️ Are you sure you want to delete all your CO₂ tracking data? This action cannot be undone.")
+        col1, col2 = st.columns(2)
+        with col1:
+            if st.button("Yes, Delete All", type="primary", key="confirm_delete"):
+                co2_tracker.clear_user_data(st.session_state.username)
+                st.success("All CO₂ data has been cleared!")
+                st.rerun()
+        with col2:
+            if st.button("Cancel", type="secondary", key="cancel_delete"):
+                st.rerun()
 
 if __name__ == "__main__":
     main()

@@ -186,16 +186,18 @@ class CO2Tracker:
             categories = ["All"] + list(set(entry['category'] for entry in data))
             selected_category = st.selectbox("Filter by Category:", categories)
         
+        # Get date range for filters
+        if data:
+            min_date = min(datetime.fromisoformat(entry['date']).date() for entry in data)
+            max_date = max(datetime.fromisoformat(entry['date']).date() for entry in data)
+        else:
+            min_date = max_date = datetime.now().date()
+
         with col2:
-            # Date range filter
-            if data:
-                min_date = min(datetime.fromisoformat(entry['date']).date() for entry in data)
-                max_date = max(datetime.fromisoformat(entry['date']).date() for entry in data)
-                start_date = st.date_input("From Date:", value=min_date, min_value=min_date, max_value=max_date)
+            start_date = st.date_input("From Date:", value=min_date, min_value=min_date, max_value=max_date)
         
         with col3:
-            if data:
-                end_date = st.date_input("To Date:", value=max_date, min_value=min_date, max_value=max_date)
+            end_date = st.date_input("To Date:", value=max_date, min_value=min_date, max_value=max_date)
         
         # Filter data
         filtered_data = sorted_data
@@ -244,11 +246,17 @@ class CO2Tracker:
                 
                 # Delete button
                 if st.button(f"🗑️ Delete", key=f"delete_{i}"):
-                    if st.confirm(f"Delete this entry: {entry['activity']}?"):
-                        data.remove(entry)
-                        self.save_user_data(username, data)
-                        st.success("Entry deleted!")
-                        st.rerun()
+                    st.warning(f"⚠️ Delete this entry: {entry['activity']}?")
+                    col1, col2 = st.columns(2)
+                    with col1:
+                        if st.button("Yes, Delete", type="primary", key=f"confirm_delete_{i}"):
+                            data.remove(entry)
+                            self.save_user_data(username, data)
+                            st.success("Entry deleted!")
+                            st.rerun()
+                    with col2:
+                        if st.button("Cancel", type="secondary", key=f"cancel_delete_{i}"):
+                            st.rerun()
         
         if not filtered_data:
             st.info("No entries match the selected filters.")
