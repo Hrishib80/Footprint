@@ -16,6 +16,13 @@ Preferred communication style: Simple, everyday language.
 - ✓ Updated dependencies and resolved all LSP diagnostics
 - ✓ Application successfully running on port 5000
 
+**2025-07-29**: Added rewards and gamification features
+- ✓ Created rewards.py with daily login streak tracking
+- ✓ Added badge system (Weekly Champions, Fortniter, Habit Builder, Monthly Mavericks)
+- ✓ Implemented global leaderboard ranking users by total CO₂ emissions
+- ✓ Added personalized carbon footprint reduction suggestions to dashboard
+- ✓ Integrated rewards page into main navigation
+
 ## System Architecture
 
 The application follows a modular, component-based architecture built on Streamlit's web framework. It uses a file-based data storage approach with YAML serialization for both user authentication and emission data persistence. The architecture separates concerns into distinct modules: authentication management, data tracking, and dashboard visualization.
@@ -44,9 +51,17 @@ The application follows a modular, component-based architecture built on Streaml
 - **Purpose**: Visualizes user emission data through charts and metrics
 - **Dependencies**: Uses Plotly for interactive charts and Pandas for data manipulation
 - **Features**: Key metrics display, time-series analysis, category breakdowns
+- **Smart Suggestions**: Personalized reduction tips based on highest emission categories
 - **Data Processing**: Converts YAML data to DataFrames for analysis
 
-### 4. Main Application (`app.py`)
+### 4. Rewards System (`rewards.py`)
+- **Purpose**: Manages user engagement through gamification features
+- **Login Tracking**: Records daily login streaks and awards badges
+- **Badge System**: Four achievement levels (7, 14, 21, 30 day streaks)
+- **Leaderboard**: Global ranking system based on total CO₂ emissions
+- **User Motivation**: Progress tracking and achievement visualization
+
+### 5. Main Application (`app.py`)
 - **Purpose**: Orchestrates the entire application flow and navigation
 - **Session Management**: Handles authentication state and page routing
 - **Configuration**: Sets up Streamlit page config and initializes components

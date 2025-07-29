@@ -30,6 +30,9 @@ class Dashboard:
         # Key metrics
         self.show_key_metrics(df)
         
+        # Suggestions based on highest emission category
+        self.show_reduction_suggestions(df)
+        
         # Charts
         col1, col2 = st.columns(2)
         
@@ -201,3 +204,129 @@ class Dashboard:
             """)
         
         st.info("💡 Tip: Start by tracking your daily commute and energy usage. These are usually the biggest contributors to personal carbon footprints!")
+    
+    def show_reduction_suggestions(self, df):
+        """Show personalized suggestions to reduce carbon footprint"""
+        st.subheader("💡 Personalized Reduction Suggestions")
+        
+        # Calculate emissions by category
+        category_emissions = df.groupby('category')['co2_amount'].sum().sort_values(ascending=False)
+        
+        if len(category_emissions) == 0:
+            return
+        
+        # Get the highest contributing category
+        top_category = category_emissions.index[0]
+        top_emissions = category_emissions.iloc[0]
+        total_emissions = df['co2_amount'].sum()
+        percentage = (top_emissions / total_emissions) * 100
+        
+        # Suggestion mappings for each category
+        suggestions = {
+            "Transportation": {
+                "emoji": "🚗",
+                "title": "Transportation Tips",
+                "tips": [
+                    "🚌 Use public transportation instead of driving",
+                    "🚴 Walk or bike for short distances",
+                    "🚗 Carpool or ride-share when possible",
+                    "✈️ Choose direct flights and economy class",
+                    "🏠 Work from home when possible",
+                    "🚊 Use trains instead of flights for medium distances"
+                ]
+            },
+            "Energy": {
+                "emoji": "⚡",
+                "title": "Energy Saving Tips",
+                "tips": [
+                    "💡 Switch to LED bulbs",
+                    "🌡️ Adjust thermostat by 2-3 degrees",
+                    "🔌 Unplug electronics when not in use",
+                    "🌞 Use natural light during the day",
+                    "❄️ Improve home insulation",
+                    "🔋 Consider renewable energy sources"
+                ]
+            },
+            "Food": {
+                "emoji": "🍽️",
+                "title": "Sustainable Food Choices",
+                "tips": [
+                    "🥬 Eat more plant-based meals",
+                    "🥩 Reduce red meat consumption",
+                    "🛒 Buy local and seasonal produce",
+                    "🗑️ Reduce food waste",
+                    "🐟 Choose sustainable seafood",
+                    "🌱 Start a small garden or herb box"
+                ]
+            },
+            "Shopping": {
+                "emoji": "🛍️",
+                "title": "Conscious Shopping Tips",
+                "tips": [
+                    "♻️ Buy secondhand or refurbished items",
+                    "🔄 Repair instead of replacing",
+                    "📦 Avoid unnecessary packaging",
+                    "🏪 Support local businesses",
+                    "👕 Choose quality over quantity",
+                    "📱 Keep electronics longer"
+                ]
+            },
+            "Home": {
+                "emoji": "🏠",
+                "title": "Home Efficiency Tips",
+                "tips": [
+                    "💧 Fix water leaks promptly",
+                    "🚿 Take shorter showers",
+                    "🌡️ Use a programmable thermostat",
+                    "🪟 Seal air leaks around windows",
+                    "🌿 Use eco-friendly cleaning products",
+                    "♻️ Improve recycling habits"
+                ]
+            }
+        }
+        
+        # Default suggestions if category not found
+        default_suggestions = {
+            "emoji": "🌍",
+            "title": "General Eco Tips",
+            "tips": [
+                "🔄 Reduce, reuse, recycle",
+                "🌱 Support renewable energy",
+                "💚 Make conscious daily choices",
+                "📚 Learn about sustainability",
+                "👥 Share eco-tips with friends",
+                "🎯 Set monthly reduction goals"
+            ]
+        }
+        
+        category_suggestion = suggestions.get(top_category, default_suggestions)
+        
+        # Display suggestion card
+        with st.container():
+            st.warning(f"""
+            **{category_suggestion['emoji']} Focus Area: {top_category}**
+            
+            This category represents {percentage:.1f}% of your total emissions ({top_emissions:.2f} kg CO₂).
+            Here are some ways to reduce your {top_category.lower()} footprint:
+            """)
+            
+            # Display tips in columns
+            col1, col2 = st.columns(2)
+            tips = category_suggestion['tips']
+            
+            with col1:
+                for tip in tips[:len(tips)//2]:
+                    st.write(f"• {tip}")
+            
+            with col2:
+                for tip in tips[len(tips)//2:]:
+                    st.write(f"• {tip}")
+        
+        # Show potential impact
+        st.info(f"""
+        💚 **Potential Impact:** Even a 10% reduction in your {top_category.lower()} emissions 
+        could save {top_emissions * 0.1:.2f} kg CO₂, which is equivalent to planting 
+        {int(top_emissions * 0.1 / 21.77):.0f} tree seedlings!
+        """)
+        
+        st.markdown("---")
