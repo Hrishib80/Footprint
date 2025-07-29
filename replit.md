@@ -30,12 +30,15 @@ The application follows a modular, component-based architecture built on Streaml
 - **UI**: Clean tabs for login/signup with enhanced form validation
 
 ### 2. CO₂ Tracking Module (`co2_tracker.py`)
-- **Purpose**: Manages emission data entry and storage for individual users
-- **Data Structure**: Stores user emissions in separate YAML files per user
-- **Features**: Supports adding, loading, and clearing emission entries
-- **Interface**: Provides tabbed interface for different entry methods (Quick, Detailed, History)
-- **Enhanced Attributes**: Location, weather, participants, purpose, efficiency ratings
-- **Activities**: Extended library of 30+ pre-calculated activities with detailed attributes
+- **Purpose**: Manages emission data entry and storage with category-specific tracking
+- **Data Structure**: Stores user emissions in PostgreSQL database with detailed attributes
+- **Categories**: Separate trackers for Transportation, Diet, Electricity, and Other Activities
+- **Interface**: Provides dedicated tabs for each emission category with customized inputs
+- **Transportation**: Tracks vehicles, distance, passengers, fuel efficiency, traffic conditions
+- **Diet**: Food tracking with preparation methods, origin, waste percentages, dietary preferences  
+- **Electricity**: Energy usage with source types, appliances, efficiency ratings, renewable mix
+- **Other Activities**: Shopping, work, entertainment with sustainability choices and necessity levels
+- **Enhanced Attributes**: Category-specific attributes with real-time CO₂ calculations
 
 ### 3. Dashboard Component (`dashboard.py`)
 - **Purpose**: Visualizes user emission data through modern charts and metrics
@@ -44,12 +47,14 @@ The application follows a modular, component-based architecture built on Streaml
 - **Styling**: Green gradient headers, modern metric cards with conditional coloring
 - **Data Processing**: Converts YAML data to DataFrames for analysis
 
-### 4. Reward System (`rewards.py`)
-- **Purpose**: Gamifies carbon footprint reduction through achievements and points
-- **Features**: Level progression, achievement badges, weekly improvement tracking
-- **Points System**: Rewards for low-carbon activities, consistency, and improvements
-- **Analytics**: Tracks best performance weeks and provides improvement tips
-- **Motivation**: Encourages sustainable behavior through positive reinforcement
+### 4. Fun Reward System (`rewards_new.py`)
+- **Purpose**: Gamified, visual reward system to motivate eco-friendly behavior
+- **Design**: Colorful achievement badges with animations and celebratory effects
+- **Features**: Level progression with emoji-based names, achievement collection grid
+- **Visual Elements**: Gradient backgrounds, animated badges, progress bars, weekly impact cards
+- **Achievements**: Simplified achievement system with fun icons and immediate feedback
+- **Analytics**: Weekly performance grading with emoji indicators and trend analysis
+- **Motivation**: Daily eco tips and motivational messages with visual appeal
 
 ### 5. Main Application (`app.py`)
 - **Purpose**: Orchestrates the entire application flow and navigation

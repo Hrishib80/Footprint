@@ -2,7 +2,7 @@ import streamlit as st
 from auth import AuthManager
 from dashboard import Dashboard
 from co2_tracker import CO2Tracker
-from rewards import RewardSystem
+from rewards_new import show_rewards_dashboard
 
 # Configure the app
 st.set_page_config(
@@ -24,7 +24,6 @@ if "current_page" not in st.session_state:
 auth_manager = AuthManager()
 dashboard = Dashboard()
 co2_tracker = CO2Tracker()
-reward_system = RewardSystem()
 
 def logout():
     """Handle user logout"""
@@ -64,7 +63,7 @@ def main():
     elif page == "Track CO₂":
         co2_tracker.show_tracker(st.session_state.username)
     elif page == "🏆 Rewards":
-        reward_system.show_rewards_dashboard(st.session_state.username)
+        show_rewards_dashboard(st.session_state.username)
     elif page == "Profile":
         show_profile()
 
