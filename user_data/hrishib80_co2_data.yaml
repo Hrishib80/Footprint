@@ -1,8 +1,8 @@
-- activity: "\U0001F697 Car trip (10 km)"
-  category: Transportation
-  co2_amount: 4.62
+- activity: "\U0001F525 Natural gas heating (1 day)"
+  category: Energy
+  co2_amount: 10.6
   date: '2025-07-29'
   entry_type: quick
   notes: ''
   quantity: 2.000000000000001
-  timestamp: '2025-07-29T10:44:22.275708'
+  timestamp: '2025-07-29T11:42:07.751981'

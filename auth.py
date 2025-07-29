@@ -1,27 +1,34 @@
 import streamlit as st
+import yaml
+import os
 from passlib.hash import pbkdf2_sha256
-from database import db_manager
 
 class AuthManager:
     def __init__(self):
-        pass
+        self.user_file = "users.yaml"
     
     def load_users(self):
-        """Load users from database (compatibility method)"""
-        return db_manager.get_all_users()
+        """Load users from YAML file"""
+        if not os.path.exists(self.user_file):
+            return {}
+        with open(self.user_file, "r") as f:
+            return yaml.safe_load(f) or {}
     
-    def login_user(self, username, password, users=None):
+    def save_users(self, users):
+        """Save users to YAML file"""
+        with open(self.user_file, "w") as f:
+            yaml.dump(users, f)
+    
+    def login_user(self, username, password, users):
         """Verify user login credentials"""
-        user = db_manager.get_user(username)
-        if user and pbkdf2_sha256.verify(password, user.password_hash):
+        if username in users and pbkdf2_sha256.verify(password, users[username]['password']):
             return True
         return False
     
     def signup_user(self, username, password):
         """Register a new user"""
-        # Check if user already exists
-        existing_user = db_manager.get_user(username)
-        if existing_user:
+        users = self.load_users()
+        if username in users:
             return False, "🚫 Username already exists!"
         
         # Validate username and password
@@ -31,14 +38,12 @@ class AuthManager:
         if len(password) < 6:
             return False, "🚫 Password must be at least 6 characters long!"
         
-        # Create user in database
-        password_hash = pbkdf2_sha256.hash(password)
-        success = db_manager.create_user(username.strip(), password_hash)
-        
-        if success:
-            return True, "✅ Signup successful! You can now login."
-        else:
-            return False, "🚫 Error creating account. Please try again."
+        users[username] = {
+            "password": pbkdf2_sha256.hash(password),
+            "created_at": str(st.session_state.get('current_time', 'Unknown'))
+        }
+        self.save_users(users)
+        return True, "✅ Signup successful! You can now login."
     
     def show_auth_page(self):
         """Display the authentication page"""
@@ -67,7 +72,8 @@ class AuthManager:
                 if not username.strip() or not password.strip():
                     st.error("❌ Please enter both username and password.")
                 else:
-                    if self.login_user(username, password):
+                    users = self.load_users()
+                    if self.login_user(username, password, users):
                         st.session_state.authenticated = True
                         st.session_state.username = username
                         st.success(f"✅ Welcome back, {username}!")

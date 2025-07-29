@@ -11,13 +11,8 @@ class Dashboard:
     
     def show_dashboard(self, username):
         """Display the main dashboard"""
-        # Modern header with green gradient effect
-        st.markdown("""
-        <div style='background: linear-gradient(90deg, #00C851, #00A040); padding: 20px; border-radius: 10px; margin-bottom: 20px;'>
-            <h1 style='color: white; margin: 0; text-align: center;'>📊 CO₂ Emissions Dashboard</h1>
-            <p style='color: white; margin: 5px 0 0 0; text-align: center; opacity: 0.9;'>Personal carbon footprint overview for {}</p>
-        </div>
-        """.format(username), unsafe_allow_html=True)
+        st.title("📊 CO₂ Emissions Dashboard")
+        st.markdown(f"**Personal carbon footprint overview for {username}**")
         
         # Load user data
         user_data = self.co2_tracker.load_user_data(username)
@@ -48,28 +43,18 @@ class Dashboard:
     
     def show_key_metrics(self, df):
         """Display key metrics cards"""
-        st.markdown("### 📈 Key Metrics")
+        st.subheader("📈 Key Metrics")
         
-        # Modern metric cards with green styling
         col1, col2, col3, col4 = st.columns(4)
         
-        # Total emissions with color coding
+        # Total emissions
         total_emissions = df['co2_amount'].sum()
         with col1:
-            # Determine color based on total emissions
-            if total_emissions < 50:
-                delta_color = "#00C851"  # Green for low emissions
-            elif total_emissions < 150:
-                delta_color = "#FF8C00"  # Orange for medium
-            else:
-                delta_color = "#DC3545"  # Red for high
-            
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #E8F5E8, #F0FFF0); padding: 15px; border-radius: 8px; border-left: 4px solid {delta_color};'>
-                <h4 style='margin: 0; color: #1B5E20;'>Total CO₂ Emissions</h4>
-                <h2 style='margin: 5px 0 0 0; color: {delta_color};'>{total_emissions:.2f} kg</h2>
-            </div>
-            """, unsafe_allow_html=True)
+            st.metric(
+                label="Total CO₂ Emissions",
+                value=f"{total_emissions:.2f} kg",
+                delta=None
+            )
         
         # Average daily emissions
         if len(df) > 0:
@@ -79,23 +64,19 @@ class Dashboard:
             avg_daily = 0
         
         with col2:
-            avg_color = "#00C851" if avg_daily < 5 else "#FF8C00" if avg_daily < 10 else "#DC3545"
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #E8F5E8, #F0FFF0); padding: 15px; border-radius: 8px; border-left: 4px solid {avg_color};'>
-                <h4 style='margin: 0; color: #1B5E20;'>Daily Average</h4>
-                <h2 style='margin: 5px 0 0 0; color: {avg_color};'>{avg_daily:.2f} kg/day</h2>
-            </div>
-            """, unsafe_allow_html=True)
+            st.metric(
+                label="Daily Average",
+                value=f"{avg_daily:.2f} kg/day",
+                delta=None
+            )
         
         # Total entries
         with col3:
-            entry_color = "#00C851" if len(df) > 20 else "#FF8C00" if len(df) > 5 else "#1B5E20"
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #E8F5E8, #F0FFF0); padding: 15px; border-radius: 8px; border-left: 4px solid {entry_color};'>
-                <h4 style='margin: 0; color: #1B5E20;'>Total Entries</h4>
-                <h2 style='margin: 5px 0 0 0; color: {entry_color};'>{len(df)}</h2>
-            </div>
-            """, unsafe_allow_html=True)
+            st.metric(
+                label="Total Entries",
+                value=len(df),
+                delta=None
+            )
         
         # Most common category
         if len(df) > 0:
@@ -104,17 +85,11 @@ class Dashboard:
             most_common = "N/A"
         
         with col4:
-            category_icons = {
-                "Transportation": "🚗", "Energy": "⚡", "Food": "🍽️", 
-                "Shopping": "🛒", "Home": "🏠", "Work": "🏢", "Other": "📦"
-            }
-            icon = category_icons.get(most_common, "📊")
-            st.markdown(f"""
-            <div style='background: linear-gradient(135deg, #E8F5E8, #F0FFF0); padding: 15px; border-radius: 8px; border-left: 4px solid #00C851;'>
-                <h4 style='margin: 0; color: #1B5E20;'>Top Category</h4>
-                <h2 style='margin: 5px 0 0 0; color: #00C851;'>{icon} {most_common}</h2>
-            </div>
-            """, unsafe_allow_html=True)
+            st.metric(
+                label="Top Category",
+                value=most_common,
+                delta=None
+            )
     
     def show_emissions_over_time(self, df):
         """Show emissions trend over time"""

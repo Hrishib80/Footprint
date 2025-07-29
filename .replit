@@ -1,4 +1,4 @@
-modules = ["python-3.11", "postgresql-16"]
+modules = ["python-3.11"]
 
 [nix]
 channel = "stable-25_05"
@@ -43,4 +43,3 @@ args = "uv add pyyaml passlib plotly"
 
 [[ports]]
 localPort = 5000
-externalPort = 80
